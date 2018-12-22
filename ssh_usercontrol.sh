@@ -53,7 +53,7 @@ Icona di notifica già presente
 			echo -e "\e[1;34m
 Imposto lista utenti
 			\e[0m"
-			yad --notification --text="Utenti remoti connessi via ssh" --command="yad --title='Utenti ssh connessi' --center --width=500 --height=150 --text='`who | grep pts`' --button=gtk-ok:0" &
+			yad --notification --text="Utenti remoti connessi via ssh" --command="yad --title='Utenti ssh connessi' --center --text='`who | grep pts`' --button=gtk-ok:0" &
 		fi
 	else
 			echo -e "\e[1;31m
@@ -61,7 +61,7 @@ Aggiorno lista utenti
 			\e[0m"
 			pkill -15 -f "yad --notification --text=Utenti remoti connessi via ssh"
 			pkill -15 -f "yad --title=Utenti ssh connessi"
-			yad --notification --text="Utenti remoti connessi via ssh" --command="yad --title='Utenti ssh connessi' --center --width=500 --height=150 --text='`who | grep pts`' --button=gtk-ok:0" &
+			yad --notification --text="Utenti remoti connessi via ssh" --command="yad --title='Utenti ssh connessi' --center --text='`who | grep pts`' --button=gtk-ok:0" &
 	fi
 	STOREDPTS="$(who | grep "pts")"
 	echo -e "\e[1;31m
