@@ -10,6 +10,16 @@ Questo script permette di controllare le attuali connessioni ssh remote su un se
 sul server, comparirà nella system tray un'icona, cliccando su quest'ultima verranno visualizzate le connessioni ssh remote correnti.
 Il controllo avviene ciclicamente con un intervallo di 10 secondi di default.
 
+### INSTALLAZIONE
+```sh
+curl -o /tmp/ssh_usercontrol.sh 'https://raw.githubusercontent.com/KeyofBlueS/ssh-usercontrol/master/ssh_usercontrol.sh'
+sudo mkdir -p /opt/ssh-usercontrol/
+sudo mv /tmp/ssh_usercontrol.sh /opt/ssh-usercontrol/
+sudo chown root:root /opt/ssh-usercontrol/ssh_usercontrol.sh
+sudo chmod 755 /opt/ssh-usercontrol/ssh_usercontrol.sh
+sudo chmod +x /opt/ssh-usercontrol/ssh_usercontrol.sh
+sudo ln -s /opt/ssh-usercontrol/ssh_usercontrol.sh /usr/local/bin/ssh-usercontrol
+
 ### UTILIZZO
 Per utilizzare manualmente lo script basta digitare su un terminale:
 ```sh
