@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Version:    1.0.2
+# Version:    1.0.4
 # Author:     KeyofBlueS
 # Repository: https://github.com/KeyofBlueS/ssh-usercontrol
 # License:    GNU General Public License v3.0, https://opensource.org/licenses/GPL-3.0
@@ -43,39 +43,37 @@ if curl -s github.com > /dev/null; then
 				scriptname="${scriptpath##*/}"
 			fi
 			if timeout -s SIGTERM 15 curl -s -o /tmp/"${scriptname}" "$SCRIPT_LINK"; then
-				sudo mv /tmp/flash_update.sh "${scriptfolder}"
-				sudo chown root:root "${scriptfolder}${scriptname}" > /dev/null 2>&1
-				sudo chmod 755 "${scriptfolder}${scriptname}" > /dev/null 2>&1
-				sudo chmod +x "${scriptfolder}${scriptname}" > /dev/null 2>&1
+				if [[ -w "${scriptfolder}${scriptname}" ]] && [[ -w "${scriptfolder}" ]]; then
+					mv /tmp/"${scriptname}" "${scriptfolder}"
+					chown root:root "${scriptfolder}${scriptname}" > /dev/null 2>&1
+					chmod 755 "${scriptfolder}${scriptname}" > /dev/null 2>&1
+					chmod +x "${scriptfolder}${scriptname}" > /dev/null 2>&1
+				elif which sudo > /dev/null 2>&1; then
+					echo -e "\e[1;33mPer proseguire con l'aggiornamento occorre concedere i permessi di amministratore\e[0m"
+					sudo mv /tmp/"${scriptname}" "${scriptfolder}"
+					sudo chown root:root "${scriptfolder}${scriptname}" > /dev/null 2>&1
+					sudo chmod 755 "${scriptfolder}${scriptname}" > /dev/null 2>&1
+					sudo chmod +x "${scriptfolder}${scriptname}" > /dev/null 2>&1
+				else
+					echo -e "\e[1;31m	Errore durante l'aggiornamento di questo script!
+Permesso negato!
+\e[0m"
+				fi
+			else
+				echo -e "\e[1;31m	Errore durante il download!
+\e[0m"
+			fi
+			LOCAL_VERSION="$(cat "${0}" | grep "# Version:" | head -n 1)"
+			if echo "$LOCAL_VERSION" | grep -q "$UPSTREAM_VERSION"; then
 				echo -e "\e[1;34m	Fatto!
 \e[0m"
 				exec "${scriptfolder}${scriptname}"
+			else
+				echo -e "\e[1;31m	Errore durante l'aggiornamento di questo script!
+\e[0m"
 			fi
 		fi
 	fi
-fi
-
-for name in yad
-do
-  [[ $(which $name 2>/dev/null) ]] || { echo -en "\n$name è richiesto da questo script. Utilizza 'sudo apt-get install $name'";deps=1; }
-done
-[[ $deps -ne 1 ]] && echo "" || { echo -en "\nInstalla le dipendenze necessarie e riavvia questo script\n";exit 1; }
-
-STOREDPTS="$(who | grep "pts")"
-
-for pid in $(pgrep "ssh-usercontrol"); do
-    if [ $pid != $$ ]; then
-        kill -9 $pid
-    fi 
-done
-
-pkill -15 -f "yad --notification --text=Utenti remoti connessi via ssh"
-pkill -15 -f "yad --title=Utenti ssh connessi"
-
-if echo $@ | grep -Poq '\d+'; then
-	TIME="$(echo $@ | grep -Po '\d+')"
-else
-	TIME=10
 fi
 
 ssh_userconnection(){
@@ -138,7 +136,7 @@ givemehelp(){
 echo "
 # ssh-usercontrol
 
-# Version:    1.0.2
+# Version:    1.0.4
 # Author:     KeyofBlueS
 # Repository: https://github.com/KeyofBlueS/ssh-usercontrol
 # License:    GNU General Public License v3.0, https://opensource.org/licenses/GPL-3.0
