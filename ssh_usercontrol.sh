@@ -1,17 +1,25 @@
 #!/bin/bash
 
-# Version:    1.0.4
+# Version:    1.0.5
 # Author:     KeyofBlueS
 # Repository: https://github.com/KeyofBlueS/ssh-usercontrol
 # License:    GNU General Public License v3.0, https://opensource.org/licenses/GPL-3.0
 
+# set to "true" to enable autoupdate of this script
+UPDATE=true
+
+if echo $UPDATE | grep -Eq '^(true|True|TRUE|si|NO|no)$'; then
+echo -e "\e[1;34mControllo aggiornamenti per questo script...\e[0m"
 if curl -s github.com > /dev/null; then
 	SCRIPT_LINK="https://raw.githubusercontent.com/KeyofBlueS/ssh-usercontrol/master/ssh_usercontrol.sh"
 	UPSTREAM_VERSION="$(timeout -s SIGTERM 15 curl -L "$SCRIPT_LINK" 2> /dev/null | grep "# Version:" | head -n 1)"
 	LOCAL_VERSION="$(cat "${0}" | grep "# Version:" | head -n 1)"
 	REPOSITORY_LINK="$(cat "${0}" | grep "# Repository:" | head -n 1)"
 	if echo "$LOCAL_VERSION" | grep -q "$UPSTREAM_VERSION"; then
-		echo -n
+		echo -e "\e[1;32m
+## Questo script risulta aggiornato alla versione upstream
+\e[0m
+"
 	else
 		echo -e "\e[1;33m-----------------------------------------------------------------------------------	
 ## ATTENZIONE: questo script non risulta aggiornato alla versione upstream, visita:
@@ -75,6 +83,7 @@ Permesso negato!
 		fi
 	fi
 fi
+fi
 
 ssh_userconnection(){
 echo -e "\e[1;34m
@@ -136,7 +145,7 @@ givemehelp(){
 echo "
 # ssh-usercontrol
 
-# Version:    1.0.4
+# Version:    1.0.5
 # Author:     KeyofBlueS
 # Repository: https://github.com/KeyofBlueS/ssh-usercontrol
 # License:    GNU General Public License v3.0, https://opensource.org/licenses/GPL-3.0
