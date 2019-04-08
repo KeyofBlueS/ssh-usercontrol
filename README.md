@@ -1,6 +1,6 @@
 # ssh-usercontrol
 
-# Version:    1.0.4
+# Version:    1.0.5
 # Author:     KeyofBlueS
 # Repository: https://github.com/KeyofBlueS/ssh-usercontrol
 # License:    GNU General Public License v3.0, https://opensource.org/licenses/GPL-3.0
