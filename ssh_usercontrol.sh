@@ -1,12 +1,12 @@
 #!/bin/bash
 
-# Version:    1.0.5
+# Version:    1.0.6
 # Author:     KeyofBlueS
 # Repository: https://github.com/KeyofBlueS/ssh-usercontrol
 # License:    GNU General Public License v3.0, https://opensource.org/licenses/GPL-3.0
 
 # set to "true" to enable autoupdate of this script
-UPDATE=true
+UPDATE=false
 
 if echo $UPDATE | grep -Eq '^(true|True|TRUE|si|NO|no)$'; then
 echo -e "\e[1;34mControllo aggiornamenti per questo script...\e[0m"
@@ -57,7 +57,18 @@ if curl -s github.com > /dev/null; then
 					chmod 755 "${scriptfolder}${scriptname}" > /dev/null 2>&1
 					chmod +x "${scriptfolder}${scriptname}" > /dev/null 2>&1
 				elif which sudo > /dev/null 2>&1; then
+					while true
+					do
 					echo -e "\e[1;33mPer proseguire con l'aggiornamento occorre concedere i permessi di amministratore\e[0m"
+					if sudo -v; then
+						break
+					else
+						echo -e "\e[1;31mPermisso negato! Premi INVIO per uscire o attendi 5 secondi per riprovare\e[0m"
+						if read -t 5 _e; then
+							exit 1
+						fi
+					fi
+					done
 					sudo mv /tmp/"${scriptname}" "${scriptfolder}"
 					sudo chown root:root "${scriptfolder}${scriptname}" > /dev/null 2>&1
 					sudo chmod 755 "${scriptfolder}${scriptname}" > /dev/null 2>&1
@@ -86,6 +97,14 @@ fi
 fi
 
 ssh_userconnection(){
+# setting interval
+if echo $INTERVAL | grep -Poq '\d+'; then
+	echo -n
+else
+	INTERVAL=10
+fi
+echo INTERVAL is: $INTERVAL seconds
+
 echo -e "\e[1;34m
 ## CONTROLLO UTENTI REMOTI CONNESSI ##
 \e[0m"
@@ -99,8 +118,7 @@ if echo $CURRENTPTS | grep -q "pts"; then
 	date
 	echo $CURRENTPTS
 	if [ "$CURRENTPTS" == "$STOREDPTS" ]; then
-		pgrep -f "yad --notification --text=Utenti remoti connessi via ssh"
-		if [ $? = 0 ]; then
+		if pgrep -f "yad --notification --text=Utenti remoti connessi via ssh" > /dev/null; then
 			echo -e "\e[1;32m
 Icona di notifica già presente
 			\e[0m"
@@ -120,8 +138,8 @@ Aggiorno lista utenti
 	fi
 	STOREDPTS="$(who | grep "pts")"
 	echo -e "\e[1;31m
-Premi INVIO per uscire, o attendi $TIME secondi per proseguire il controllo\e[0m"
-	if read -t "$TIME" _e; then
+Premi INVIO per uscire, o attendi $INTERVAL secondi per proseguire il controllo\e[0m"
+	if read -t "$INTERVAL" _e; then
 		pkill -15 -f "yad --notification --text=Utenti remoti connessi via ssh"
 		pkill -15 -f "yad --title=Utenti ssh connessi"
 		exit 0
@@ -133,8 +151,8 @@ else
 	pkill -15 -f "yad --notification --text=Utenti remoti connessi via ssh"
 	pkill -15 -f "yad --title=Utenti ssh connessi"
 	echo -e "\e[1;31m
-Premi INVIO per uscire, o attendi $TIME secondi per proseguire il controllo\e[0m"
-	if read -t "$TIME" _e; then
+Premi INVIO per uscire, o attendi $INTERVAL secondi per proseguire il controllo\e[0m"
+	if read -t "$INTERVAL" _e; then
 		exit 0
 	fi
 fi
@@ -145,7 +163,7 @@ givemehelp(){
 echo "
 # ssh-usercontrol
 
-# Version:    1.0.5
+# Version:    1.0.6
 # Author:     KeyofBlueS
 # Repository: https://github.com/KeyofBlueS/ssh-usercontrol
 # License:    GNU General Public License v3.0, https://opensource.org/licenses/GPL-3.0
@@ -163,16 +181,40 @@ $ ssh-usercontrol
 
 È possibile utilizzare le seguenti opzioni:
 
---secondi n   Imposta l'intervallo di tempo, in secondi, fra un controllo ed il seguente (default: 10 secondi)
+--interval <n>	-i <n>	Imposta l'intervallo di tempo di <n> secondi, fra un controllo ed il seguente (default: 10 secondi)
 
---help        Visualizza una descrizione ed opzioni di ssh-usercontrol
+--help		-h	Visualizza una descrizione ed opzioni di ssh-usercontrol
 "
 exit 0
 }
 
-if [ "$1" = "" ]; then
-	ssh_userconnection
-elif [ "$1" = "--help" ]; then
+for opt in "$@"; do
+	shift
+	case "$opt" in
+		'--interval')		set -- "$@" '-i' ;;
+		'--help')		set -- "$@" '-h' ;;
+		*)                      set -- "$@" "$opt"
+	esac
+done
+
+while getopts ":i:h" opt; do
+	case ${opt} in
+		i ) if echo $OPTARG | grep -Poq '\d+'; then
+			INTERVAL=$OPTARG
+		else
+			echo -e "\e[1;33m - WARNING: option -i requires an argument\e[0m"
+			INTERVAL=10
+		fi
+		;;
+		h ) STEP=givemehelp
+		;;
+		*) INVALID=1; echo -e "\e[1;31m## ERROR: invalid option $OPTARG\e[0m"
+	esac
+done
+
+if echo $INVALID | grep -xq "1"; then
+	givemehelp
+elif echo $STEP | grep -xq "givemehelp"; then
 	givemehelp
 else
 	ssh_userconnection
