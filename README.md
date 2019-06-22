@@ -19,7 +19,7 @@ sudo chown root:root /opt/ssh-usercontrol/ssh_usercontrol.sh
 sudo chmod 755 /opt/ssh-usercontrol/ssh_usercontrol.sh
 sudo chmod +x /opt/ssh-usercontrol/ssh_usercontrol.sh
 sudo ln -s /opt/ssh-usercontrol/ssh_usercontrol.sh /usr/local/bin/ssh-usercontrol
-
+```
 ### UTILIZZO
 Per utilizzare manualmente lo script basta digitare su un terminale:
 ```sh
