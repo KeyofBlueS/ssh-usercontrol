@@ -1,6 +1,6 @@
 # ssh-usercontrol
 
-# Version:    1.0.5
+# Version:    1.0.6
 # Author:     KeyofBlueS
 # Repository: https://github.com/KeyofBlueS/ssh-usercontrol
 # License:    GNU General Public License v3.0, https://opensource.org/licenses/GPL-3.0
@@ -28,7 +28,7 @@ $ ssh-usercontrol
 
 È possibile utilizzare le seguenti opzioni:
 ```
---secondi n   Imposta l'intervallo di tempo, in secondi, fra un controllo ed il seguente (default: 10 secondi)
+--interval <n>	-i <n>	Imposta l'intervallo di tempo di <n> secondi fra un controllo ed il seguente (default: 10 secondi)
 
---help        Visualizza una descrizione ed opzioni di ssh-usercontrol
+--help		-h	Visualizza una descrizione ed opzioni di ssh-usercontrol
 ```
